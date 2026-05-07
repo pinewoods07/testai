@@ -13,24 +13,10 @@ st.set_page_config(
 
 # ── Vertex AI 인증 ───────────────────────────────────────────────
 @st.cache_resource
-def init_vertex():
-    sa = st.secrets["gcp_service_account"]
-    sa_info = {k: sa[k] for k in [
-        "type", "project_id", "private_key_id", "private_key",
-        "client_email", "client_id", "auth_uri", "token_uri",
-        "auth_provider_x509_cert_url", "client_x509_cert_url",
-    ]}
-    credentials = service_account.Credentials.from_service_account_info(
-        sa_info,
-        scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    )
-    vertexai.init(
-        project=sa_info["project_id"],
-        location="us-central1",        # ✅ "global" → "us-central1" 로 변경
-        credentials=credentials,
-    )
+def init_client():
+    return anthropic.Anthropic(api_key=st.secrets["ANTHROPIC_API_KEY"])
 
-init_vertex()
+client = init_client()
 
 # ── 공통 멤버 정보 ────────────────────────────────────────────────
 MEMBERS_INFO = """
