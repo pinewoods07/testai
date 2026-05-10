@@ -11,6 +11,231 @@ st.set_page_config(
     layout="wide",
 )
 
+# ── 커스텀 CSS ─────────────────────────────────────────────────
+def inject_css():
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Cinzel:wght@400;700&display=swap');
+
+    .stApp {
+        background: linear-gradient(135deg, #0f0c1a 0%, #1a1035 50%, #0d1b2a 100%);
+        font-family: 'Noto Sans KR', sans-serif;
+    }
+
+    .main .block-container {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 20px;
+        border: 1px solid rgba(180, 140, 255, 0.15);
+        padding: 2rem 2.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #130d2e 0%, #0d1b35 100%) !important;
+        border-right: 1px solid rgba(180, 140, 255, 0.2);
+    }
+    [data-testid="stSidebar"] .stMarkdown p,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] .stRadio label {
+        color: #c8b8ff !important;
+    }
+
+    h1 {
+        font-family: 'Cinzel', serif !important;
+        background: linear-gradient(90deg, #d4a8ff, #a78bfa, #818cf8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 2px;
+    }
+    h2, h3 {
+        color: #c4b5fd !important;
+    }
+
+    .stTabs [data-baseweb="tab-list"] {
+        background: rgba(139, 92, 246, 0.1);
+        border-radius: 12px;
+        padding: 4px;
+        gap: 4px;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 8px;
+        color: #9d8ec7 !important;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        padding: 8px 20px;
+    }
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    }
+
+    [data-testid="stChatMessage"] {
+        border-radius: 16px;
+        padding: 1rem;
+        margin-bottom: 0.8rem;
+        animation: fadeInUp 0.3s ease;
+        border: 1px solid transparent;
+    }
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+        background: rgba(99, 102, 241, 0.12);
+        border-color: rgba(99, 102, 241, 0.25);
+    }
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+        background: rgba(139, 92, 246, 0.08);
+        border-color: rgba(139, 92, 246, 0.2);
+        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1);
+    }
+
+    [data-testid="stChatInput"] {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(139, 92, 246, 0.4) !important;
+        border-radius: 16px !important;
+        color: #e2e8f0 !important;
+    }
+    [data-testid="stChatInput"]:focus-within {
+        border-color: rgba(167, 139, 250, 0.8) !important;
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.25) !important;
+    }
+
+    .stButton > button {
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(79, 70, 229, 0.3));
+        color: #c4b5fd !important;
+        border: 1px solid rgba(139, 92, 246, 0.4) !important;
+        border-radius: 10px !important;
+        font-family: 'Noto Sans KR', sans-serif !important;
+        transition: all 0.25s ease !important;
+        font-weight: 500;
+    }
+    .stButton > button:hover {
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.6), rgba(79, 70, 229, 0.6)) !important;
+        border-color: rgba(167, 139, 250, 0.7) !important;
+        color: #fff !important;
+        box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35) !important;
+        transform: translateY(-1px);
+    }
+    .stButton > button[kind="primary"] {
+        background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    }
+    .stButton > button[kind="primary"]:hover {
+        background: linear-gradient(135deg, #6d28d9, #4338ca) !important;
+        box-shadow: 0 6px 25px rgba(124, 58, 237, 0.55) !important;
+        transform: translateY(-2px);
+    }
+
+    .stTextInput > div > div > input,
+    .stTextArea > div > div > textarea {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(139, 92, 246, 0.3) !important;
+        border-radius: 10px !important;
+        color: #e2e8f0 !important;
+        font-family: 'Noto Sans KR', sans-serif !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stTextInput > div > div > input:focus,
+    .stTextArea > div > div > textarea:focus {
+        border-color: rgba(167, 139, 250, 0.7) !important;
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.2) !important;
+    }
+
+    .stSelectbox > div > div {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(139, 92, 246, 0.3) !important;
+        border-radius: 10px !important;
+        color: #e2e8f0 !important;
+    }
+
+    .stRadio > div { gap: 6px; }
+    .stRadio [data-testid="stMarkdownContainer"] p {
+        color: #c4b5fd !important;
+    }
+
+    .streamlit-expanderHeader {
+        background: rgba(139, 92, 246, 0.1) !important;
+        border: 1px solid rgba(139, 92, 246, 0.2) !important;
+        border-radius: 10px !important;
+        color: #c4b5fd !important;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    .streamlit-expanderHeader:hover {
+        background: rgba(139, 92, 246, 0.2) !important;
+        border-color: rgba(167, 139, 250, 0.4) !important;
+    }
+    .streamlit-expanderContent {
+        background: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid rgba(139, 92, 246, 0.15) !important;
+        border-top: none !important;
+        border-radius: 0 0 10px 10px !important;
+    }
+
+    div[data-testid="column"] .stButton > button {
+        height: auto;
+        white-space: normal;
+        text-align: left;
+        padding: 12px 14px;
+        line-height: 1.5;
+        font-size: 0.85rem;
+    }
+
+    hr { border-color: rgba(139, 92, 246, 0.2) !important; }
+
+    .stCaption, [data-testid="stCaptionContainer"] {
+        color: #8b7fa8 !important;
+    }
+    .stAlert {
+        background: rgba(139, 92, 246, 0.1) !important;
+        border: 1px solid rgba(139, 92, 246, 0.3) !important;
+        border-radius: 12px !important;
+        color: #c4b5fd !important;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(139, 92, 246, 0.4);
+        border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.7); }
+
+    .stMarkdown, p, li { color: #d1c8e8 !important; }
+    strong { color: #c4b5fd !important; }
+    code {
+        background: rgba(139, 92, 246, 0.15) !important;
+        color: #a78bfa !important;
+        border-radius: 4px;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    [data-testid="stSidebar"] h1 {
+        font-size: 1.3rem !important;
+        text-align: center;
+        padding: 0.5rem 0;
+    }
+
+    .stDownloadButton > button {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2)) !important;
+        border-color: rgba(16, 185, 129, 0.4) !important;
+        color: #6ee7b7 !important;
+    }
+    .stDownloadButton > button:hover {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(5, 150, 105, 0.4)) !important;
+        color: #fff !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+inject_css()
+
 # ── 데이터 경로 ────────────────────────────────────────────────
 DATA_DIR = "data"
 
@@ -125,12 +350,9 @@ def save_current_state():
 # ── 사이드바 ────────────────────────────────────────────────────
 with st.sidebar:
     st.title("📖 창작 AI 어시스턴트")
-
     st.divider()
 
-    # 프로젝트 관리
     st.subheader("📁 프로젝트")
-
     projects = get_projects()
 
     with st.expander("➕ 새 프로젝트 만들기"):
@@ -156,7 +378,6 @@ with st.sidebar:
             load_project(selected_proj)
             st.rerun()
 
-        # 프로젝트 삭제
         with st.expander("🗑️ 프로젝트 삭제"):
             st.caption(f"'{st.session_state.current_project}' 프로젝트를 삭제합니다.")
             if st.button("삭제 확인", type="primary", use_container_width=True):
@@ -174,7 +395,6 @@ with st.sidebar:
 
     st.divider()
 
-    # 모드 선택
     st.subheader("✨ 어시스턴트 모드")
     selected_mode = st.radio(
         "모드",
@@ -188,7 +408,6 @@ with st.sidebar:
 
     st.divider()
 
-    # 대화 초기화
     if st.button("🗑️ 대화 초기화", use_container_width=True):
         st.session_state.messages = []
         save_current_state()
@@ -205,8 +424,27 @@ if not st.session_state.current_project:
 
 proj = st.session_state.current_project
 
+# ── 프로젝트 헤더 배너 ─────────────────────────────────────────
+st.markdown(f"""
+<div style="
+    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(79,70,229,0.15));
+    border: 1px solid rgba(139,92,246,0.3);
+    border-radius: 16px;
+    padding: 1.2rem 1.8rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+">
+    <span style="font-size:2rem;">📖</span>
+    <div>
+        <h2 style="margin:0; color:#c4b5fd; font-family:'Cinzel',serif; letter-spacing:1px;">{proj}</h2>
+        <p style="margin:0; color:#8b7fa8; font-size:0.85rem;">창작 AI 어시스턴트 · {st.session_state.mode}</p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 # ── 메인 탭 ────────────────────────────────────────────────────
-st.title(f"📖 {proj}")
 tab_chat, tab_chars, tab_world, tab_fav = st.tabs(["💬 대화", "👤 캐릭터 DB", "🌍 세계관 DB", "⭐ 즐겨찾기"])
 
 
@@ -214,7 +452,6 @@ tab_chat, tab_chars, tab_world, tab_fav = st.tabs(["💬 대화", "👤 캐릭�
 # TAB 1: 대화
 # ════════════════════════════════════════════════════════════════
 with tab_chat:
-    # 모드 표시 + 내보내기
     col_mode, col_exp = st.columns([3, 1])
     with col_mode:
         st.caption(f"현재 모드: **{st.session_state.mode}**")
@@ -233,7 +470,6 @@ with tab_chat:
                 st.download_button("📄 .txt로 저장", chat_txt, f"{proj}_{now}.txt", "text/plain", use_container_width=True)
                 st.download_button("📝 .md로 저장", chat_md, f"{proj}_{now}.md", "text/markdown", use_container_width=True)
 
-    # 힌트 버튼 (대화 없을 때)
     if not st.session_state.messages:
         hints = MODE_HINTS.get(st.session_state.mode, [])
         st.markdown("#### 💡 이렇게 시작해보세요")
@@ -245,19 +481,16 @@ with tab_chat:
                     save_current_state()
                     st.rerun()
 
-    # 세계관 메모 컨텍스트 로드
     world_db = load_project_data(proj, "world", {})
-    char_db = load_project_data(proj, "characters", [])
+    char_db  = load_project_data(proj, "characters", [])
 
-    # 대화 출력
     for i, msg in enumerate(st.session_state.messages):
         with st.chat_message(msg["role"], avatar="🧑‍💻" if msg["role"] == "user" else "📖"):
             st.markdown(msg["content"])
 
-            # AI 메시지에만 즐겨찾기 버튼
             if msg["role"] == "assistant":
                 fav_ids = [f["id"] for f in st.session_state.favorites]
-                is_fav = i in fav_ids
+                is_fav  = i in fav_ids
                 btn_label = "⭐ 즐겨찾기 해제" if is_fav else "☆ 즐겨찾기"
                 if st.button(btn_label, key=f"fav_{i}", help="이 답변을 즐겨찾기에 저장합니다"):
                     if is_fav:
@@ -272,14 +505,12 @@ with tab_chat:
                     save_current_state()
                     st.rerun()
 
-    # 채팅 입력
     if prompt := st.chat_input("창작에 대해 무엇이든 물어보세요..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
 
         with st.chat_message("user", avatar="🧑‍💻"):
             st.markdown(prompt)
 
-        # 시스템 프롬프트 구성 (세계관/캐릭터 DB 컨텍스트 자동 주입)
         system = SYSTEM_PROMPTS[st.session_state.mode]
         context_parts = []
         if world_db:
@@ -291,8 +522,8 @@ with tab_chat:
             system += "\n\n" + "\n\n".join(context_parts)
 
         with st.chat_message("assistant", avatar="📖"):
-            placeholder = st.empty()
-            full_response = ""
+            placeholder    = st.empty()
+            full_response  = ""
             try:
                 client = anthropic.Anthropic(api_key=API_KEY)
                 with client.messages.stream(
@@ -306,7 +537,7 @@ with tab_chat:
                         placeholder.markdown(full_response + "▌")
                 placeholder.markdown(full_response)
             except anthropic.AuthenticationError:
-                st.error("❌ API 키가 올바르지 않습니다. Streamlit Secrets의 ANTHROPIC_API_KEY를 확인해주세요.")
+                st.error("❌ API 키가 올바르지 않습니다.")
                 st.session_state.messages.pop()
                 st.stop()
             except Exception as e:
@@ -330,17 +561,17 @@ with tab_chars:
     with st.expander("➕ 새 캐릭터 추가"):
         with st.form("new_char_form", clear_on_submit=True):
             c1, c2, c3 = st.columns(3)
-            name     = c1.text_input("이름 *")
-            role     = c2.selectbox("역할", ["주인공", "조연", "빌런", "조력자", "기타"])
-            age      = c3.text_input("나이/나이대")
+            name    = c1.text_input("이름 *")
+            role    = c2.selectbox("역할", ["주인공", "조연", "빌런", "조력자", "기타"])
+            age     = c3.text_input("나이/나이대")
 
             d1, d2 = st.columns(2)
-            appearance   = d1.text_area("외형", height=80, placeholder="키, 머리색, 눈색, 특징 등")
-            personality  = d2.text_area("성격", height=80, placeholder="MBTI, 핵심 성격, 말투 등")
+            appearance  = d1.text_area("외형",    height=80, placeholder="키, 머리색, 눈색, 특징 등")
+            personality = d2.text_area("성격",    height=80, placeholder="MBTI, 핵심 성격, 말투 등")
 
             e1, e2 = st.columns(2)
-            background   = e1.text_area("배경", height=80, placeholder="출신, 과거, 트라우마 등")
-            motivation   = e2.text_area("동기/목표", height=80, placeholder="원하는 것, 두려운 것 등")
+            background  = e1.text_area("배경",    height=80, placeholder="출신, 과거, 트라우마 등")
+            motivation  = e2.text_area("동기/목표", height=80, placeholder="원하는 것, 두려운 것 등")
 
             notes = st.text_area("메모", height=60, placeholder="관계, 비밀, 기타 설정 등")
 
@@ -421,14 +652,13 @@ with tab_fav:
     st.subheader("⭐ 즐겨찾기한 답변")
 
     favs = load_project_data(proj, "favorites", [])
-    # 세션 상태와 동기화
     st.session_state.favorites = favs
 
     if not favs:
         st.info("아직 즐겨찾기한 답변이 없어요.\n대화 탭에서 AI 답변 아래 ☆ 버튼을 눌러보세요!")
     else:
         now_str = datetime.now().strftime("%Y%m%d_%H%M")
-        fav_md = "\n\n---\n\n".join([
+        fav_md  = "\n\n---\n\n".join([
             f"**[{f.get('mode','')} | {f.get('saved_at','')}]**\n\n{f['content']}"
             for f in favs
         ])
