@@ -11,230 +11,422 @@ st.set_page_config(
     layout="wide",
 )
 
-# ── 커스텀 CSS ─────────────────────────────────────────────────
-def inject_css():
-    st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Cinzel:wght@400;700&display=swap');
+# ── 테마 CSS ───────────────────────────────────────────────────
+LIGHT_CSS = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap');
 
-    .stApp {
-        background: linear-gradient(135deg, #0f0c1a 0%, #1a1035 50%, #0d1b2a 100%);
-        font-family: 'Noto Sans KR', sans-serif;
-    }
+.stApp {
+    background: #f8f7f4;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+.main .block-container {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e8e3dc;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+}
 
-    .main .block-container {
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 20px;
-        border: 1px solid rgba(180, 140, 255, 0.15);
-        padding: 2rem 2.5rem;
-        backdrop-filter: blur(10px);
-    }
+/* 사이드바 */
+[data-testid="stSidebar"] {
+    background: #faf9f6 !important;
+    border-right: 1px solid #e8e3dc;
+}
+[data-testid="stSidebar"] .stMarkdown p,
+[data-testid="stSidebar"] label {
+    color: #4a4540 !important;
+}
 
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #130d2e 0%, #0d1b35 100%) !important;
-        border-right: 1px solid rgba(180, 140, 255, 0.2);
-    }
-    [data-testid="stSidebar"] .stMarkdown p,
-    [data-testid="stSidebar"] label,
-    [data-testid="stSidebar"] .stRadio label {
-        color: #c8b8ff !important;
-    }
+/* 제목 */
+h1 {
+    font-family: 'Playfair Display', serif !important;
+    color: #2c2420 !important;
+    letter-spacing: 1px;
+}
+h2, h3 { color: #3d3530 !important; }
 
-    h1 {
-        font-family: 'Cinzel', serif !important;
-        background: linear-gradient(90deg, #d4a8ff, #a78bfa, #818cf8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: 2px;
-    }
-    h2, h3 {
-        color: #c4b5fd !important;
-    }
+/* 탭 */
+.stTabs [data-baseweb="tab-list"] {
+    background: #f0ede8;
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+    border: 1px solid #e0dbd4;
+}
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px;
+    color: #7a706a !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    padding: 8px 20px;
+}
+.stTabs [aria-selected="true"] {
+    background: #ffffff !important;
+    color: #2c2420 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
 
-    .stTabs [data-baseweb="tab-list"] {
-        background: rgba(139, 92, 246, 0.1);
-        border-radius: 12px;
-        padding: 4px;
-        gap: 4px;
-        border: 1px solid rgba(139, 92, 246, 0.2);
-    }
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 8px;
-        color: #9d8ec7 !important;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        padding: 8px 20px;
-    }
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
-        color: white !important;
-        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
-    }
+/* 채팅 */
+[data-testid="stChatMessage"] {
+    border-radius: 14px;
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    animation: fadeInUp 0.3s ease;
+    border: 1px solid transparent;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+    background: #f0ede8;
+    border-color: #e0dbd4;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+    background: #fdfcfb;
+    border-color: #e8e3dc;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
 
-    [data-testid="stChatMessage"] {
-        border-radius: 16px;
-        padding: 1rem;
-        margin-bottom: 0.8rem;
-        animation: fadeInUp 0.3s ease;
-        border: 1px solid transparent;
-    }
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        background: rgba(99, 102, 241, 0.12);
-        border-color: rgba(99, 102, 241, 0.25);
-    }
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
-        background: rgba(139, 92, 246, 0.08);
-        border-color: rgba(139, 92, 246, 0.2);
-        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1);
-    }
+/* 채팅 입력 */
+[data-testid="stChatInput"] {
+    background: #ffffff !important;
+    border: 1px solid #d0c9c0 !important;
+    border-radius: 14px !important;
+    color: #2c2420 !important;
+}
+[data-testid="stChatInput"]:focus-within {
+    border-color: #a09080 !important;
+    box-shadow: 0 0 0 3px rgba(160,144,128,0.15) !important;
+}
 
-    [data-testid="stChatInput"] {
-        background: rgba(255,255,255,0.05) !important;
-        border: 1px solid rgba(139, 92, 246, 0.4) !important;
-        border-radius: 16px !important;
-        color: #e2e8f0 !important;
-    }
-    [data-testid="stChatInput"]:focus-within {
-        border-color: rgba(167, 139, 250, 0.8) !important;
-        box-shadow: 0 0 20px rgba(139, 92, 246, 0.25) !important;
-    }
+/* 버튼 */
+.stButton > button {
+    background: #ffffff !important;
+    color: #4a4540 !important;
+    border: 1px solid #d0c9c0 !important;
+    border-radius: 10px !important;
+    font-family: 'Noto Sans KR', sans-serif !important;
+    transition: all 0.2s ease !important;
+    font-weight: 500;
+}
+.stButton > button:hover {
+    background: #f0ede8 !important;
+    border-color: #a09080 !important;
+    color: #2c2420 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    transform: translateY(-1px);
+}
+.stButton > button[kind="primary"] {
+    background: #2c2420 !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(44,36,32,0.25);
+}
+.stButton > button[kind="primary"]:hover {
+    background: #4a4540 !important;
+    box-shadow: 0 4px 16px rgba(44,36,32,0.3) !important;
+    transform: translateY(-2px);
+}
 
-    .stButton > button {
-        background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(79, 70, 229, 0.3));
-        color: #c4b5fd !important;
-        border: 1px solid rgba(139, 92, 246, 0.4) !important;
-        border-radius: 10px !important;
-        font-family: 'Noto Sans KR', sans-serif !important;
-        transition: all 0.25s ease !important;
-        font-weight: 500;
-    }
-    .stButton > button:hover {
-        background: linear-gradient(135deg, rgba(124, 58, 237, 0.6), rgba(79, 70, 229, 0.6)) !important;
-        border-color: rgba(167, 139, 250, 0.7) !important;
-        color: #fff !important;
-        box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35) !important;
-        transform: translateY(-1px);
-    }
-    .stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
-        color: white !important;
-        border: none !important;
-        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
-    }
-    .stButton > button[kind="primary"]:hover {
-        background: linear-gradient(135deg, #6d28d9, #4338ca) !important;
-        box-shadow: 0 6px 25px rgba(124, 58, 237, 0.55) !important;
-        transform: translateY(-2px);
-    }
+/* 입력창 */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea {
+    background: #ffffff !important;
+    border: 1px solid #d0c9c0 !important;
+    border-radius: 10px !important;
+    color: #2c2420 !important;
+    font-family: 'Noto Sans KR', sans-serif !important;
+}
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+    border-color: #a09080 !important;
+    box-shadow: 0 0 0 3px rgba(160,144,128,0.15) !important;
+}
 
-    .stTextInput > div > div > input,
-    .stTextArea > div > div > textarea {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(139, 92, 246, 0.3) !important;
-        border-radius: 10px !important;
-        color: #e2e8f0 !important;
-        font-family: 'Noto Sans KR', sans-serif !important;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .stTextInput > div > div > input:focus,
-    .stTextArea > div > div > textarea:focus {
-        border-color: rgba(167, 139, 250, 0.7) !important;
-        box-shadow: 0 0 15px rgba(139, 92, 246, 0.2) !important;
-    }
+/* 셀렉트박스 */
+.stSelectbox > div > div {
+    background: #ffffff !important;
+    border: 1px solid #d0c9c0 !important;
+    border-radius: 10px !important;
+    color: #2c2420 !important;
+}
 
-    .stSelectbox > div > div {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(139, 92, 246, 0.3) !important;
-        border-radius: 10px !important;
-        color: #e2e8f0 !important;
-    }
+/* Expander */
+.streamlit-expanderHeader {
+    background: #f5f2ee !important;
+    border: 1px solid #e0dbd4 !important;
+    border-radius: 10px !important;
+    color: #4a4540 !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.streamlit-expanderHeader:hover {
+    background: #ede9e3 !important;
+}
+.streamlit-expanderContent {
+    background: #fdfcfb !important;
+    border: 1px solid #e0dbd4 !important;
+    border-top: none !important;
+    border-radius: 0 0 10px 10px !important;
+}
 
-    .stRadio > div { gap: 6px; }
-    .stRadio [data-testid="stMarkdownContainer"] p {
-        color: #c4b5fd !important;
-    }
+/* 힌트 버튼 */
+div[data-testid="column"] .stButton > button {
+    height: auto;
+    white-space: normal;
+    text-align: left;
+    padding: 12px 14px;
+    line-height: 1.5;
+    font-size: 0.85rem;
+}
 
-    .streamlit-expanderHeader {
-        background: rgba(139, 92, 246, 0.1) !important;
-        border: 1px solid rgba(139, 92, 246, 0.2) !important;
-        border-radius: 10px !important;
-        color: #c4b5fd !important;
-        font-weight: 500;
-        transition: all 0.2s ease;
-    }
-    .streamlit-expanderHeader:hover {
-        background: rgba(139, 92, 246, 0.2) !important;
-        border-color: rgba(167, 139, 250, 0.4) !important;
-    }
-    .streamlit-expanderContent {
-        background: rgba(255, 255, 255, 0.02) !important;
-        border: 1px solid rgba(139, 92, 246, 0.15) !important;
-        border-top: none !important;
-        border-radius: 0 0 10px 10px !important;
-    }
+hr { border-color: #e8e3dc !important; }
 
-    div[data-testid="column"] .stButton > button {
-        height: auto;
-        white-space: normal;
-        text-align: left;
-        padding: 12px 14px;
-        line-height: 1.5;
-        font-size: 0.85rem;
-    }
+.stCaption, [data-testid="stCaptionContainer"] { color: #9a9088 !important; }
+.stAlert {
+    background: #f5f2ee !important;
+    border: 1px solid #d0c9c0 !important;
+    border-radius: 12px !important;
+    color: #4a4540 !important;
+}
 
-    hr { border-color: rgba(139, 92, 246, 0.2) !important; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f0ede8; }
+::-webkit-scrollbar-thumb { background: #c8c0b8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a09080; }
 
-    .stCaption, [data-testid="stCaptionContainer"] {
-        color: #8b7fa8 !important;
-    }
-    .stAlert {
-        background: rgba(139, 92, 246, 0.1) !important;
-        border: 1px solid rgba(139, 92, 246, 0.3) !important;
-        border-radius: 12px !important;
-        color: #c4b5fd !important;
-    }
+.stMarkdown, p, li { color: #3d3530 !important; }
+strong { color: #2c2420 !important; }
+code {
+    background: #f0ede8 !important;
+    color: #7a4030 !important;
+    border-radius: 4px;
+}
 
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
-    ::-webkit-scrollbar-thumb {
-        background: rgba(139, 92, 246, 0.4);
-        border-radius: 3px;
-    }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.7); }
+.stDownloadButton > button {
+    background: #f0f7f0 !important;
+    border-color: #b0ccb0 !important;
+    color: #3a6040 !important;
+}
+.stDownloadButton > button:hover {
+    background: #dff0df !important;
+    color: #2a4a30 !important;
+}
 
-    .stMarkdown, p, li { color: #d1c8e8 !important; }
-    strong { color: #c4b5fd !important; }
-    code {
-        background: rgba(139, 92, 246, 0.15) !important;
-        color: #a78bfa !important;
-        border-radius: 4px;
-    }
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+"""
 
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(10px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
+DARK_CSS = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap');
 
-    [data-testid="stSidebar"] h1 {
-        font-size: 1.3rem !important;
-        text-align: center;
-        padding: 0.5rem 0;
-    }
+.stApp {
+    background: #141414;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+.main .block-container {
+    background: #1c1c1c;
+    border-radius: 16px;
+    border: 1px solid #2e2e2e;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
 
-    .stDownloadButton > button {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2)) !important;
-        border-color: rgba(16, 185, 129, 0.4) !important;
-        color: #6ee7b7 !important;
-    }
-    .stDownloadButton > button:hover {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(5, 150, 105, 0.4)) !important;
-        color: #fff !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+/* 사이드바 */
+[data-testid="stSidebar"] {
+    background: #181818 !important;
+    border-right: 1px solid #2e2e2e;
+}
+[data-testid="stSidebar"] .stMarkdown p,
+[data-testid="stSidebar"] label {
+    color: #c8c8c8 !important;
+}
 
-inject_css()
+/* 제목 */
+h1 {
+    font-family: 'Playfair Display', serif !important;
+    color: #f0f0f0 !important;
+    letter-spacing: 1px;
+}
+h2, h3 { color: #d8d8d8 !important; }
+
+/* 탭 */
+.stTabs [data-baseweb="tab-list"] {
+    background: #242424;
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+    border: 1px solid #333333;
+}
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px;
+    color: #888888 !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    padding: 8px 20px;
+}
+.stTabs [aria-selected="true"] {
+    background: #333333 !important;
+    color: #f0f0f0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* 채팅 */
+[data-testid="stChatMessage"] {
+    border-radius: 14px;
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    animation: fadeInUp 0.3s ease;
+    border: 1px solid transparent;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+    background: #242424;
+    border-color: #333333;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+    background: #1e1e1e;
+    border-color: #2e2e2e;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+/* 채팅 입력 */
+[data-testid="stChatInput"] {
+    background: #242424 !important;
+    border: 1px solid #3a3a3a !important;
+    border-radius: 14px !important;
+    color: #e8e8e8 !important;
+}
+[data-testid="stChatInput"]:focus-within {
+    border-color: #666666 !important;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.05) !important;
+}
+
+/* 버튼 */
+.stButton > button {
+    background: #242424 !important;
+    color: #c8c8c8 !important;
+    border: 1px solid #3a3a3a !important;
+    border-radius: 10px !important;
+    font-family: 'Noto Sans KR', sans-serif !important;
+    transition: all 0.2s ease !important;
+    font-weight: 500;
+}
+.stButton > button:hover {
+    background: #2e2e2e !important;
+    border-color: #555555 !important;
+    color: #f0f0f0 !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
+    transform: translateY(-1px);
+}
+.stButton > button[kind="primary"] {
+    background: #e8e8e8 !important;
+    color: #141414 !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(255,255,255,0.1);
+}
+.stButton > button[kind="primary"]:hover {
+    background: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(255,255,255,0.15) !important;
+    transform: translateY(-2px);
+}
+
+/* 입력창 */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea {
+    background: #242424 !important;
+    border: 1px solid #3a3a3a !important;
+    border-radius: 10px !important;
+    color: #e8e8e8 !important;
+    font-family: 'Noto Sans KR', sans-serif !important;
+}
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+    border-color: #666666 !important;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.05) !important;
+}
+
+/* 셀렉트박스 */
+.stSelectbox > div > div {
+    background: #242424 !important;
+    border: 1px solid #3a3a3a !important;
+    border-radius: 10px !important;
+    color: #e8e8e8 !important;
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+    background: #242424 !important;
+    border: 1px solid #333333 !important;
+    border-radius: 10px !important;
+    color: #c8c8c8 !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.streamlit-expanderHeader:hover {
+    background: #2e2e2e !important;
+    border-color: #444444 !important;
+}
+.streamlit-expanderContent {
+    background: #1e1e1e !important;
+    border: 1px solid #2e2e2e !important;
+    border-top: none !important;
+    border-radius: 0 0 10px 10px !important;
+}
+
+/* 힌트 버튼 */
+div[data-testid="column"] .stButton > button {
+    height: auto;
+    white-space: normal;
+    text-align: left;
+    padding: 12px 14px;
+    line-height: 1.5;
+    font-size: 0.85rem;
+}
+
+hr { border-color: #2e2e2e !important; }
+
+.stCaption, [data-testid="stCaptionContainer"] { color: #666666 !important; }
+.stAlert {
+    background: #242424 !important;
+    border: 1px solid #3a3a3a !important;
+    border-radius: 12px !important;
+    color: #c8c8c8 !important;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #1c1c1c; }
+::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555555; }
+
+.stMarkdown, p, li { color: #c8c8c8 !important; }
+strong { color: #f0f0f0 !important; }
+code {
+    background: #2e2e2e !important;
+    color: #a8c8a8 !important;
+    border-radius: 4px;
+}
+
+.stDownloadButton > button {
+    background: #1e2a1e !important;
+    border-color: #3a5a3a !important;
+    color: #90c890 !important;
+}
+.stDownloadButton > button:hover {
+    background: #263626 !important;
+    color: #b0e8b0 !important;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+"""
+
+def inject_css(theme: str):
+    st.markdown(LIGHT_CSS if theme == "☀️ 라이트" else DARK_CSS, unsafe_allow_html=True)
 
 # ── 데이터 경로 ────────────────────────────────────────────────
 DATA_DIR = "data"
@@ -323,10 +515,14 @@ defaults = {
     "messages": [],
     "favorites": [],
     "current_project": None,
+    "theme": "☀️ 라이트",        # ← 테마 기본값
 }
 for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
+
+# ── CSS 주입 (세션 테마 기준) ───────────────────────────────────
+inject_css(st.session_state.theme)
 
 # ── API 키 로드 ─────────────────────────────────────────────────
 try:
@@ -338,20 +534,35 @@ except KeyError:
 # ── 프로젝트 로드 함수 ──────────────────────────────────────────
 def load_project(proj):
     st.session_state.current_project = proj
-    st.session_state.messages = load_project_data(proj, "history", [])
+    st.session_state.messages  = load_project_data(proj, "history",   [])
     st.session_state.favorites = load_project_data(proj, "favorites", [])
 
 def save_current_state():
     proj = st.session_state.current_project
     if proj:
-        save_project_data(proj, "history", st.session_state.messages)
+        save_project_data(proj, "history",   st.session_state.messages)
         save_project_data(proj, "favorites", st.session_state.favorites)
 
 # ── 사이드바 ────────────────────────────────────────────────────
 with st.sidebar:
     st.title("📖 창작 AI 어시스턴트")
+
+    # ── 테마 토글 ──────────────────────────────────────────────
+    st.divider()
+    selected_theme = st.radio(
+        "테마",
+        ["☀️ 라이트", "🌙 다크"],
+        index=0 if st.session_state.theme == "☀️ 라이트" else 1,
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+    if selected_theme != st.session_state.theme:
+        st.session_state.theme = selected_theme
+        st.rerun()
+
     st.divider()
 
+    # ── 프로젝트 관리 ──────────────────────────────────────────
     st.subheader("📁 프로젝트")
     projects = get_projects()
 
@@ -371,7 +582,7 @@ with st.sidebar:
             "프로젝트 선택",
             projects,
             index=projects.index(st.session_state.current_project) if st.session_state.current_project in projects else 0,
-            label_visibility="collapsed"
+            label_visibility="collapsed",
         )
         if selected_proj != st.session_state.current_project:
             save_current_state()
@@ -387,7 +598,7 @@ with st.sidebar:
                 if st.session_state.current_project:
                     load_project(st.session_state.current_project)
                 else:
-                    st.session_state.messages = []
+                    st.session_state.messages  = []
                     st.session_state.favorites = []
                 st.rerun()
     else:
@@ -395,12 +606,13 @@ with st.sidebar:
 
     st.divider()
 
+    # ── 모드 선택 ──────────────────────────────────────────────
     st.subheader("✨ 어시스턴트 모드")
     selected_mode = st.radio(
         "모드",
         list(SYSTEM_PROMPTS.keys()),
         index=list(SYSTEM_PROMPTS.keys()).index(st.session_state.mode),
-        label_visibility="collapsed"
+        label_visibility="collapsed",
     )
     if selected_mode != st.session_state.mode:
         st.session_state.mode = selected_mode
@@ -424,11 +636,22 @@ if not st.session_state.current_project:
 
 proj = st.session_state.current_project
 
-# ── 프로젝트 헤더 배너 ─────────────────────────────────────────
+# ── 헤더 배너 (테마별 색상) ────────────────────────────────────
+if st.session_state.theme == "☀️ 라이트":
+    banner_bg     = "linear-gradient(135deg, #f5f2ee, #ede9e3)"
+    banner_border = "#d0c9c0"
+    title_color   = "#2c2420"
+    sub_color     = "#9a9088"
+else:
+    banner_bg     = "linear-gradient(135deg, #242424, #1e1e1e)"
+    banner_border = "#3a3a3a"
+    title_color   = "#f0f0f0"
+    sub_color     = "#666666"
+
 st.markdown(f"""
 <div style="
-    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(79,70,229,0.15));
-    border: 1px solid rgba(139,92,246,0.3);
+    background: {banner_bg};
+    border: 1px solid {banner_border};
     border-radius: 16px;
     padding: 1.2rem 1.8rem;
     margin-bottom: 1rem;
@@ -438,8 +661,8 @@ st.markdown(f"""
 ">
     <span style="font-size:2rem;">📖</span>
     <div>
-        <h2 style="margin:0; color:#c4b5fd; font-family:'Cinzel',serif; letter-spacing:1px;">{proj}</h2>
-        <p style="margin:0; color:#8b7fa8; font-size:0.85rem;">창작 AI 어시스턴트 · {st.session_state.mode}</p>
+        <h2 style="margin:0; color:{title_color}; font-family:'Playfair Display',serif; letter-spacing:1px;">{proj}</h2>
+        <p style="margin:0; color:{sub_color}; font-size:0.85rem;">창작 AI 어시스턴트 · {st.session_state.mode}</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -467,8 +690,8 @@ with tab_chat:
                 for m in st.session_state.messages
             ])
             with st.popover("💾 내보내기"):
-                st.download_button("📄 .txt로 저장", chat_txt, f"{proj}_{now}.txt", "text/plain", use_container_width=True)
-                st.download_button("📝 .md로 저장", chat_md, f"{proj}_{now}.md", "text/markdown", use_container_width=True)
+                st.download_button("📄 .txt로 저장", chat_txt, f"{proj}_{now}.txt", "text/plain",    use_container_width=True)
+                st.download_button("📝 .md로 저장",  chat_md,  f"{proj}_{now}.md",  "text/markdown", use_container_width=True)
 
     if not st.session_state.messages:
         hints = MODE_HINTS.get(st.session_state.mode, [])
@@ -481,16 +704,15 @@ with tab_chat:
                     save_current_state()
                     st.rerun()
 
-    world_db = load_project_data(proj, "world", {})
+    world_db = load_project_data(proj, "world",      {})
     char_db  = load_project_data(proj, "characters", [])
 
     for i, msg in enumerate(st.session_state.messages):
         with st.chat_message(msg["role"], avatar="🧑‍💻" if msg["role"] == "user" else "📖"):
             st.markdown(msg["content"])
-
             if msg["role"] == "assistant":
-                fav_ids = [f["id"] for f in st.session_state.favorites]
-                is_fav  = i in fav_ids
+                fav_ids   = [f["id"] for f in st.session_state.favorites]
+                is_fav    = i in fav_ids
                 btn_label = "⭐ 즐겨찾기 해제" if is_fav else "☆ 즐겨찾기"
                 if st.button(btn_label, key=f"fav_{i}", help="이 답변을 즐겨찾기에 저장합니다"):
                     if is_fav:
@@ -522,8 +744,8 @@ with tab_chat:
             system += "\n\n" + "\n\n".join(context_parts)
 
         with st.chat_message("assistant", avatar="📖"):
-            placeholder    = st.empty()
-            full_response  = ""
+            placeholder   = st.empty()
+            full_response = ""
             try:
                 client = anthropic.Anthropic(api_key=API_KEY)
                 with client.messages.stream(
@@ -555,7 +777,6 @@ with tab_chat:
 # ════════════════════════════════════════════════════════════════
 with tab_chars:
     char_db = load_project_data(proj, "characters", [])
-
     st.subheader("👤 캐릭터 목록")
 
     with st.expander("➕ 새 캐릭터 추가"):
@@ -566,11 +787,11 @@ with tab_chars:
             age     = c3.text_input("나이/나이대")
 
             d1, d2 = st.columns(2)
-            appearance  = d1.text_area("외형",    height=80, placeholder="키, 머리색, 눈색, 특징 등")
-            personality = d2.text_area("성격",    height=80, placeholder="MBTI, 핵심 성격, 말투 등")
+            appearance  = d1.text_area("외형",     height=80, placeholder="키, 머리색, 눈색, 특징 등")
+            personality = d2.text_area("성격",     height=80, placeholder="MBTI, 핵심 성격, 말투 등")
 
             e1, e2 = st.columns(2)
-            background  = e1.text_area("배경",    height=80, placeholder="출신, 과거, 트라우마 등")
+            background  = e1.text_area("배경",     height=80, placeholder="출신, 과거, 트라우마 등")
             motivation  = e2.text_area("동기/목표", height=80, placeholder="원하는 것, 두려운 것 등")
 
             notes = st.text_area("메모", height=60, placeholder="관계, 비밀, 기타 설정 등")
@@ -614,20 +835,19 @@ with tab_chars:
 # ════════════════════════════════════════════════════════════════
 with tab_world:
     world_db = load_project_data(proj, "world", {})
-
     st.subheader("🌍 세계관 설정")
     st.caption("입력한 내용은 대화 탭의 AI에게 자동으로 전달됩니다.")
 
     WORLD_FIELDS = {
-        "장르": "판타지, SF, 현대물 등",
-        "배경 시대": "중세, 근미래, 현대 등",
+        "장르":        "판타지, SF, 현대물 등",
+        "배경 시대":   "중세, 근미래, 현대 등",
         "지리/세계 구조": "대륙, 국가, 도시 구성 등",
         "역사/연대기": "주요 사건, 전쟁, 신화 등",
         "마법/기술 체계": "마법 원리, 기술 수준, 제한 등",
-        "종족/세력": "주요 종족, 국가, 조직 등",
-        "문화/종교": "풍습, 신앙, 가치관 등",
-        "핵심 갈등": "세계관의 중심 갈등, 위기 등",
-        "기타 메모": "위 항목에 맞지 않는 설정",
+        "종족/세력":   "주요 종족, 국가, 조직 등",
+        "문화/종교":   "풍습, 신앙, 가치관 등",
+        "핵심 갈등":   "세계관의 중심 갈등, 위기 등",
+        "기타 메모":   "위 항목에 맞지 않는 설정",
     }
 
     with st.form("world_form"):
