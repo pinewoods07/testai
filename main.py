@@ -81,16 +81,6 @@ with st.sidebar:
 
     st.divider()
 
-    # API 키 입력
-    api_key = st.text_input(
-        "🔑 Anthropic API Key",
-        type="password",
-        placeholder="sk-ant-...",
-        help="Anthropic 콘솔에서 발급받은 API 키를 입력하세요."
-    )
-
-    st.divider()
-
     # 모드 선택
     st.subheader("✨ 어시스턴트 모드")
     selected_mode = st.radio(
@@ -211,8 +201,10 @@ for msg in st.session_state.messages:
 
 # ── 사용자 입력 처리 ────────────────────────────────────────────
 if prompt := st.chat_input("창작에 대해 무엇이든 물어보세요..."):
-    if not api_key:
-        st.error("⚠️ 사이드바에 Anthropic API 키를 입력해주세요.")
+    try:
+        api_key = st.secrets["ANTHROPIC_API_KEY"]
+    except KeyError:
+        st.error("⚠️ Streamlit Secrets에 `ANTHROPIC_API_KEY`가 설정되지 않았습니다.")
         st.stop()
 
     # 사용자 메시지 추가
