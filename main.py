@@ -778,7 +778,43 @@ with tab_editor:
 # ════════════════════════════════════════════════════════════════
 # TAB 3: 캐릭터 DB
 # ════════════════════════════════════════════════════════════════
-                with col_a:
+with tab_chars:
+    char_db = load_project_data(username, proj, "characters", [])
+    st.subheader("👤 캐릭터 목록")
+
+    with st.expander("➕ 새 캐릭터 추가"):
+        with st.form("new_char_form", clear_on_submit=True):
+            c1, c2, c3 = st.columns(3)
+            name    = c1.text_input("이름 *")
+            role    = c2.selectbox("역할", ["주인공", "조연", "빌런", "조력자", "기타"])
+            age     = c3.text_input("나이/나이대")
+            d1, d2  = st.columns(2)
+            appearance  = d1.text_area("외형",     height=80, placeholder="키, 머리색, 눈색, 특징 등")
+            personality = d2.text_area("성격",     height=80, placeholder="MBTI, 핵심 성격, 말투 등")
+            e1, e2  = st.columns(2)
+            background  = e1.text_area("배경",     height=80, placeholder="출신, 과거, 트라우마 등")
+            motivation  = e2.text_area("동기/목표", height=80, placeholder="원하는 것, 두려운 것 등")
+            notes = st.text_area("메모", height=60, placeholder="관계, 비밀, 기타 설정 등")
+            if st.form_submit_button("캐릭터 저장", use_container_width=True, type="primary"):
+                if name.strip():
+                    char_db.append({
+                        "name": name, "role": role, "age": age,
+                        "appearance": appearance, "personality": personality,
+                        "background": background, "motivation": motivation,
+                        "notes": notes,
+                    })
+                    save_project_data(username, proj, "characters", char_db)
+                    st.success(f"'{name}' 캐릭터가 추가됐어요!")
+                    st.rerun()
+
+    if not char_db:
+        st.info("아직 캐릭터가 없어요. 위에서 추가해보세요!")
+    else:
+        role_colors = {"주인공": "🟡", "빌런": "🔴", "조연": "🔵", "조력자": "🟢", "기타": "⚪"}
+        for i, char in enumerate(char_db):
+            icon = role_colors.get(char.get("role","기타"), "⚪")
+            with st.expander(f"{icon} {char['name']}  |  {char.get('role','')}  |  {char.get('age','')}"):
+                               with col_a:
                     if char.get("appearance"):  st.markdown(f"**👁 외형**\n{char['appearance']}")
                     if char.get("background"):  st.markdown(f"**📜 배경**\n{char['background']}")
                 with col_b:
