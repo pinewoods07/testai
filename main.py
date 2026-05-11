@@ -778,43 +778,253 @@ with tab_editor:
 # ════════════════════════════════════════════════════════════════
 # TAB 3: 캐릭터 DB
 # ════════════════════════════════════════════════════════════════
-with tab_chars:
-    char_db = load_project_data(username, proj, "characters", [])
-    st.subheader("👤 캐릭터 목록")
-
-    with st.expander("➕ 새 캐릭터 추가"):
-        with st.form("new_char_form", clear_on_submit=True):
-            c1, c2, c3 = st.columns(3)
-            name    = c1.text_input("이름 *")
-            role    = c2.selectbox("역할", ["주인공", "조연", "빌런", "조력자", "기타"])
-            age     = c3.text_input("나이/나이대")
-            d1, d2  = st.columns(2)
-            appearance  = d1.text_area("외형",     height=80, placeholder="키, 머리색, 눈색, 특징 등")
-            personality = d2.text_area("성격",     height=80, placeholder="MBTI, 핵심 성격, 말투 등")
-            e1, e2  = st.columns(2)
-            background  = e1.text_area("배경",     height=80, placeholder="출신, 과거, 트라우마 등")
-            motivation  = e2.text_area("동기/목표", height=80, placeholder="원하는 것, 두려운 것 등")
-            notes = st.text_area("메모", height=60, placeholder="관계, 비밀, 기타 설정 등")
-            if st.form_submit_button("캐릭터 저장", use_container_width=True, type="primary"):
-                if name.strip():
-                    char_db.append({
-                        "name": name, "role": role, "age": age,
-                        "appearance": appearance, "personality": personality,
-                        "background": background, "motivation": motivation,
-                        "notes": notes,
-                    })
-                    save_project_data(username, proj, "characters", char_db)
-                    st.success(f"'{name}' 캐릭터가 추가됐어요!")
-                    st.rerun()
-
-    if not char_db:
-        st.info("아직 캐릭터가 없어요. 위에서 추가해보세요!")
-    else:
-        role_colors = {"주인공": "🟡", "빌런": "🔴", "조연": "🔵", "조력자": "🟢", "기타": "⚪"}
-        for i, char in enumerate(char_db):
-            icon = role_colors.get(char.get("role","기타"), "⚪")
-            with st.expander(f"{icon} {char['name']}  |  {char.get('role','')}  |  {char.get('age','')}"):
-                col_a, col_b = st.columns(2)
                 with col_a:
                     if char.get("appearance"):  st.markdown(f"**👁 외형**\n{char['appearance']}")
-                    if char.get("background"):  st.markdown(f"**📜 배경**\n{
+                    if char.get("background"):  st.markdown(f"**📜 배경**\n{char['background']}")
+                with col_b:
+                    if char.get("personality"): st.markdown(f"**💭 성격**\n{char['personality']}")
+                    if char.get("motivation"):  st.markdown(f"**🎯 동기**\n{char['motivation']}")
+                if char.get("notes"):           st.markdown(f"**📝 메모**\n{char['notes']}")
+                if st.button("🗑️ 삭제", key=f"del_char_{i}"):
+                    char_db.pop(i)
+                    save_project_data(username, proj, "characters", char_db)
+                    st.rerun()
+
+
+# ════════════════════════════════════════════════════════════════
+# TAB 4: 캐릭터 관계도
+# ════════════════════════════════════════════════════════════════
+with tab_relation:
+    st.subheader("🔗 캐릭터 관계도")
+    st.caption("캐릭터 사이의 관계를 등록하고 한눈에 확인해요.")
+
+    char_db   = load_project_data(username, proj, "characters", [])
+    relations = load_project_data(username, proj, "relations",  [])
+
+    if len(char_db) < 2:
+        st.info("캐릭터가 2명 이상 있어야 관계도를 만들 수 있어요. 캐릭터 DB 탭에서 먼저 추가해주세요!")
+    else:
+        char_names = [c["name"] for c in char_db]
+
+        with st.expander("➕ 관계 추가"):
+            with st.form("relation_form", clear_on_submit=True):
+                r1, r2, r3 = st.columns(3)
+                char_a   = r1.selectbox("캐릭터 A", char_names, key="rel_a")
+                rel_type = r2.selectbox("관계 유형", [
+                    "💕 연인", "👫 친구", "⚔️ 적대", "🤝 동료",
+                    "👨‍👩‍👧 가족", "🎓 사제", "🔮 라이벌", "🤫 비밀관계", "기타"
+                ])
+                char_b   = r3.selectbox("캐릭터 B", char_names, key="rel_b")
+                rel_desc = st.text_input("관계 설명", placeholder="예: 어릴 때부터 함께한 소꿉친구, 하지만 숨겨진 비밀이 있다")
+
+                if st.form_submit_button("관계 저장", type="primary", use_container_width=True):
+                    if char_a == char_b:
+                        st.error("같은 캐릭터는 선택할 수 없어요.")
+                    else:
+                        relations.append({
+                            "char_a":   char_a,
+                            "char_b":   char_b,
+                            "type":     rel_type,
+                            "desc":     rel_desc,
+                            "added_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                        })
+                        save_project_data(username, proj, "relations", relations)
+                        st.success("관계가 추가됐어요!")
+                        st.rerun()
+
+        if not relations:
+            st.info("아직 등록된 관계가 없어요.")
+        else:
+            # ── 관계도 시각화 (HTML/CSS) ───────────────────────
+            role_color_map = {
+                "주인공": "#f59e0b", "빌런": "#ef4444",
+                "조연":  "#3b82f6", "조력자": "#22c55e", "기타": "#9ca3af"
+            }
+            rel_color_map = {
+                "💕 연인": "#f472b6", "👫 친구": "#34d399",
+                "⚔️ 적대": "#f87171", "🤝 동료": "#60a5fa",
+                "👨‍👩‍👧 가족": "#a78bfa", "🎓 사제": "#fbbf24",
+                "🔮 라이벌": "#fb923c", "🤫 비밀관계": "#818cf8", "기타": "#9ca3af"
+            }
+
+            # 캐릭터별 역할 색상
+            char_role_map = {c["name"]: c.get("role","기타") for c in char_db}
+
+            # 관계 카드 표시
+            st.markdown("#### 📋 관계 목록")
+            for i, rel in enumerate(relations):
+                color = rel_color_map.get(rel["type"], "#9ca3af")
+                bg    = "#1e1e1e" if is_dark else "#fdfcfb"
+                border= "#2e2e2e" if is_dark else "#e8e3dc"
+                tc    = "#f0f0f0" if is_dark else "#2c2420"
+                sc    = "#888888" if is_dark else "#9a9088"
+
+                st.markdown(f"""
+                <div style="background:{bg};border:1px solid {border};border-left:4px solid {color};
+                border-radius:10px;padding:12px 16px;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                        <span style="font-weight:700;color:{tc};font-size:0.95rem;">
+                            {rel['char_a']}
+                        </span>
+                        <span style="background:{color}22;color:{color};border:1px solid {color}44;
+                        border-radius:20px;padding:2px 10px;font-size:0.8rem;font-weight:600;">
+                            {rel['type']}
+                        </span>
+                        <span style="font-weight:700;color:{tc};font-size:0.95rem;">
+                            {rel['char_b']}
+                        </span>
+                    </div>
+                    {f'<div style="color:{sc};font-size:0.85rem;margin-top:6px;">{rel["desc"]}</div>' if rel.get("desc") else ""}
+                </div>
+                """, unsafe_allow_html=True)
+
+                if st.button("🗑️ 삭제", key=f"del_rel_{i}"):
+                    relations.pop(i)
+                    save_project_data(username, proj, "relations", relations)
+                    st.rerun()
+
+            # ── 캐릭터별 관계 요약 ─────────────────────────────
+            st.divider()
+            st.markdown("#### 👥 캐릭터별 관계 요약")
+            for char_name in char_names:
+                related = [
+                    r for r in relations
+                    if r["char_a"] == char_name or r["char_b"] == char_name
+                ]
+                if related:
+                    role  = char_role_map.get(char_name, "기타")
+                    color = role_color_map.get(role, "#9ca3af")
+                    with st.expander(f"**{char_name}** ({role}) - {len(related)}개 관계"):
+                        for r in related:
+                            other = r["char_b"] if r["char_a"] == char_name else r["char_a"]
+                            rc    = rel_color_map.get(r["type"], "#9ca3af")
+                            st.markdown(f"""
+                            <div style="display:flex;align-items:center;gap:8px;margin:4px 0;">
+                                <span style="color:{rc};font-size:0.85rem;">{r['type']}</span>
+                                <span style="font-weight:600;">→ {other}</span>
+                                {f'<span style="color:{sc};font-size:0.8rem;">· {r["desc"]}</span>' if r.get("desc") else ""}
+                            </div>
+                            """, unsafe_allow_html=True)
+
+
+# ════════════════════════════════════════════════════════════════
+# TAB 5: 세계관 DB
+# ════════════════════════════════════════════════════════════════
+with tab_world:
+    world_db = load_project_data(username, proj, "world", {})
+    st.subheader("🌍 세계관 설정")
+    st.caption("입력한 내용은 대화 탭의 AI에게 자동으로 전달됩니다.")
+
+    WORLD_FIELDS = {
+        "장르":           "판타지, SF, 현대물 등",
+        "배경 시대":      "중세, 근미래, 현대 등",
+        "지리/세계 구조": "대륙, 국가, 도시 구성 등",
+        "역사/연대기":    "주요 사건, 전쟁, 신화 등",
+        "마법/기술 체계": "마법 원리, 기술 수준, 제한 등",
+        "종족/세력":      "주요 종족, 국가, 조직 등",
+        "문화/종교":      "풍습, 신앙, 가치관 등",
+        "핵심 갈등":      "세계관의 중심 갈등, 위기 등",
+        "기타 메모":      "위 항목에 맞지 않는 설정",
+    }
+
+    with st.form("world_form"):
+        updated = {}
+        for field, placeholder in WORLD_FIELDS.items():
+            updated[field] = st.text_area(
+                field, value=world_db.get(field,""),
+                placeholder=placeholder, height=80,
+            )
+        if st.form_submit_button("💾 저장", use_container_width=True, type="primary"):
+            save_project_data(username, proj, "world", updated)
+            st.success("세계관 설정이 저장됐어요!")
+            st.rerun()
+
+
+# ════════════════════════════════════════════════════════════════
+# TAB 6: 즐겨찾기
+# ════════════════════════════════════════════════════════════════
+with tab_fav:
+    st.subheader("⭐ 즐겨찾기한 답변")
+    favs = load_project_data(username, proj, "favorites", [])
+    st.session_state.favorites = favs
+
+    if not favs:
+        st.info("아직 즐겨찾기한 답변이 없어요.\n대화 탭에서 AI 답변 아래 ☆ 버튼을 눌러보세요!")
+    else:
+        now_str = datetime.now().strftime("%Y%m%d_%H%M")
+        fav_md  = "\n\n---\n\n".join([
+            f"**[{f.get('mode','')} | {f.get('saved_at','')}]**\n\n{f['content']}"
+            for f in favs
+        ])
+        st.download_button("📝 즐겨찾기 전체 .md 저장", fav_md,
+            f"{proj}_즐겨찾기_{now_str}.md", "text/markdown")
+        st.divider()
+
+        for i, fav in enumerate(favs):
+            with st.expander(f"⭐ {fav.get('mode','')}  |  {fav.get('saved_at','')}"):
+                st.markdown(fav["content"])
+                if st.button("⭐ 즐겨찾기 해제", key=f"unfav_{i}"):
+                    favs.pop(i)
+                    save_project_data(username, proj, "favorites", favs)
+                    st.session_state.favorites = favs
+                    st.rerun()
+
+
+# ════════════════════════════════════════════════════════════════
+# TAB 7: 랜덤 창작 주제
+# ════════════════════════════════════════════════════════════════
+with tab_random:
+    st.subheader("🎲 랜덤 창작 주제 생성기")
+    st.caption("막힐 때 버튼 하나로 영감을 얻어보세요!")
+
+    cat_cols = st.columns(len(RANDOM_PROMPTS))
+    selected_cat = None
+
+    for i, (cat, col) in enumerate(zip(RANDOM_PROMPTS.keys(), cat_cols)):
+        with col:
+            if st.button(cat, use_container_width=True, key=f"cat_{i}"):
+                picked = random.choice(RANDOM_PROMPTS[cat])
+                st.session_state.random_result = {"cat": cat, "text": picked}
+
+    if st.button("🎰 전체 카테고리에서 랜덤!", use_container_width=True, type="primary"):
+        cat  = random.choice(list(RANDOM_PROMPTS.keys()))
+        picked = random.choice(RANDOM_PROMPTS[cat])
+        st.session_state.random_result = {"cat": cat, "text": picked}
+
+    if st.session_state.random_result:
+        res = st.session_state.random_result
+        bg  = "#1e1e1e" if is_dark else "#fdfcfb"
+        bc  = "#3a3a3a" if is_dark else "#e8e3dc"
+        tc  = "#f0f0f0" if is_dark else "#2c2420"
+        sc  = "#888888" if is_dark else "#9a9088"
+
+        st.markdown(f"""
+        <div style="background:{bg};border:2px solid {bc};border-radius:16px;
+        padding:2rem;margin:1rem 0;text-align:center;">
+            <div style="font-size:0.85rem;color:{sc};margin-bottom:0.5rem;">{res['cat']}</div>
+            <div style="font-size:1.3rem;font-weight:700;color:{tc};line-height:1.6;">
+                {res['text']}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        col_use, col_ask = st.columns(2)
+        with col_use:
+            if st.button("✍️ 이걸로 AI에게 물어보기", use_container_width=True, type="primary"):
+                ai_q = f"다음 창작 아이디어를 발전시켜주세요: {res['text']}"
+                st.session_state.messages.append({"role": "user", "content": ai_q})
+                save_current_state()
+                st.info("💬 대화 탭으로 이동해서 AI 응답을 확인하세요!")
+        with col_ask:
+            if st.button("🎲 다시 뽑기", use_container_width=True):
+                cat    = res["cat"]
+                picked = random.choice(RANDOM_PROMPTS[cat])
+                st.session_state.random_result = {"cat": cat, "text": picked}
+                st.rerun()
+
+    st.divider()
+    st.markdown("#### 📚 전체 주제 목록")
+    for cat, items in RANDOM_PROMPTS.items():
+        with st.expander(cat):
+            for item in items:
+                st.markdown(f"- {item}")
